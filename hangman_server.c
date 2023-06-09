@@ -1,15 +1,3 @@
-/*
-skeleton code for TCP connection sourced from:
-https://stackoverflow.com/questions/11405819/does-struct-hostent-have-a-field-h-addr
-https://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/client.c
-
-srand logic sourced from: 
-https://www.tutorialspoint.com/c_standard_library/c_function_srand.htm
-
-some file reading logic sourced from: 
-https://stackoverflow.com/questions/27856886/read-text-file-and-store-in-array-in-c-programming
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,6 +17,7 @@ https://stackoverflow.com/questions/27856886/read-text-file-and-store-in-array-i
 
 // Client struct for storing data about a client
 typedef struct {
+    int sockfd;
     int remaining_guesses;
     char guessed_letters[MAX_GUESS_LENGTH + 1];
     char incorrect_letters[MAX_GUESS_LENGTH + 1];
@@ -37,7 +26,7 @@ typedef struct {
 // Error handling function
 void error(char *msg) {
     perror(msg);
-    exit(0);
+    exit(EXIT_FAILURE);
 }
 
 // Function to read words from a file
@@ -180,11 +169,11 @@ int main(int argc, char *argv[]) {
                         memset(cli_words[i], '_', sizeof(cli_words[i]));
                         cli_words[i][wordlen] = '\0';
                         totalClients++;
+                        clients[i].sockfd = newsockfd;
                         write(newsockfd, &(int){0}, 1);
                         
                         int word_length = strlen(words[wordno]);
                         write(newsockfd, &word_length, sizeof(int));
-                        write(newsockfd, words[wordno], word_length);
 
                         break;
                     }
@@ -199,25 +188,18 @@ int main(int argc, char *argv[]) {
 
         // Handle client messages
         for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (FD_ISSET(newsockfds[i], &fds)) {
+            if (newsockfds[i] > 0 && FD_ISSET(newsockfds[i], &fds)) {
                 int n = recv(newsockfds[i], buffer, 1, 0);
                 if (n < 0) {
                     error("ERROR receiving");
                 }
                 if (n == 0) {  // Client disconnected
+                    printf("Client %d disconnected.\n", i+1);
                     close(newsockfds[i]);
                     newsockfds[i] = 0;
                     totalClients--;
                 }
                 else {
-                    // Check for termination message
-                    if (strcmp(buffer, "Client terminated") == 0) {
-                        printf("\nClient %d terminated.\n", i+1);
-                        close(newsockfds[i]);
-                        newsockfds[i] = 0;
-                        totalClients--;
-                        continue;
-                    }
                     // Handle client guess
                     int msglen = buffer[0];
                     if (msglen == 0) {
@@ -227,6 +209,15 @@ int main(int argc, char *argv[]) {
                     n = recv(newsockfds[i], buffer, msglen, 0);
                     if (n < 0) {
                         error("ERROR receiving");
+                    }
+
+                    // Check for termination message
+                    if (strcmp(buffer, "Client terminated") == 0) {
+                        printf("Client %d terminated connection.\n", i+1);
+                        close(newsockfds[i]);
+                        newsockfds[i] = 0;
+                        totalClients--;
+                        break;
                     }
 
                     // Update the game status
@@ -260,7 +251,7 @@ int main(int argc, char *argv[]) {
                         write(newsockfds[i], &cli_guesses_len, 1);
                         write(newsockfds[i], cli_words[i], cli_word_len);
                         write(newsockfds[i], clients[i].guessed_letters, cli_guesses_len);
-                    }       
+                    }
                 }
             }
         }

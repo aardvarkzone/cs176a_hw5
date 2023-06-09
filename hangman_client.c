@@ -79,7 +79,8 @@ void playHangman(int sockfd) {
         printf("Letter to guess: ");
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
             if (feof(stdin)) {
-                printf("\n");
+                printf("\nEOF detected. Terminating...\n");
+
                 // Send termination message to server (this depends on your protocol)
                 char term_msg[] = "Client terminated";
                 write(sockfd, term_msg, sizeof(term_msg));
@@ -109,13 +110,22 @@ void playHangman(int sockfd) {
 
                 memset(buffer, 0, BUFFER_SIZE);
                 read(sockfd, buffer, wordlen);
-                printf("%s\n", buffer);
+
+                // Print correct word with spaces in between characters
+                for (int i = 0; i < wordlen; i++) {
+                    printf("%c ", buffer[i]);
+                }
+                printf("\n");
                 printf("Incorrect guesses: ");
 
                 if (guesslen > 0) {
                     memset(buffer, 0, BUFFER_SIZE);
                     read(sockfd, buffer, guesslen);
-                    printf("%s", buffer);
+
+                    // Print incorrect guesses with spaces in between
+                    for (int i = 0; i < guesslen; i++) {
+                        printf("%c ", buffer[i]);
+                    }
                 }
                 printf("\n");
             } else {
@@ -129,6 +139,8 @@ void playHangman(int sockfd) {
         }
     }
 }
+
+
 
 int main(int argc, char *argv[]) {
     // ./hangman_client [IP] [port number... use 8080] 

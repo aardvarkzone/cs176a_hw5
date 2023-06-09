@@ -232,17 +232,17 @@ int main(int argc, char *argv[]) {
                         write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
                         write(newsockfds[i], "The word was ", 13);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\nYou win!\nGame over!", 20);
+                        write(newsockfds[i], "\nYou win!\nGame over!", 21);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
                     }
                     // Game end condition: no more guesses!
                     else if (clients[i].remaining_guesses == 0) {
-                        write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], &(int){34 + strlen(words[cli_wordnos[i]])}, 1);
                         write(newsockfds[i], "The word was ", 13);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\nYou lose!\nGame over!", 20);
+                        write(newsockfds[i], "\nYou lose!\nGame over!", 21);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;

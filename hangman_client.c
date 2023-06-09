@@ -65,7 +65,7 @@ void playHangman(int sockfd) {
         return;
     }
 
-    printf("> > >Ready to start game? (y/n): ");
+    printf(">>>Ready to start game? (y/n): ");
     fflush(stdout);
     fgets(buffer, BUFFER_SIZE, stdin);
     if (buffer[0] != 'y') {
@@ -79,10 +79,8 @@ void playHangman(int sockfd) {
 
     // Receive the word length from the server
     read(sockfd, &word_length, sizeof(int));
-    
-    // // Clear the buffer
-    // memset(buffer, 0, BUFFER_SIZE);
-    printf("> > >");
+
+    printf(">>>");
     for (int i = 0; i < word_length; i++) {
         if (i != (word_length - 1)) {
             printf("_ ");
@@ -90,19 +88,20 @@ void playHangman(int sockfd) {
             printf("_\n");
         }
     }
-    printf("> > >Incorrect Guesses: \n> > >\n");
+    printf(">>>Incorrect Guesses: \n>>>\n");
+
 
     for (;;) {
-        printf("> > >Letter to guess: ");
+        printf(">>>Letter to guess: ");
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
             if (feof(stdin)) {
-                printf("test\n");
+                printf("\n");
                 // Send termination message to server 
                 char term_msg[] = "Client terminated";
                 write(sockfd, term_msg, sizeof(term_msg));
-                close(sockfd);
 
-                return;
+                close(sockfd);
+                exit(EXIT_SUCCESS);
             }
         }
 
@@ -110,7 +109,7 @@ void playHangman(int sockfd) {
 
         letter = buffer[0];
         if (strlen(buffer) != 1 || !isalpha(letter)) {
-            printf("> > >Error! Please guess one letter.\n");
+            printf("Error! Please guess one letter.\n");
         } else {
             buffer[0] = 1;
             buffer[1] = tolower(letter);
@@ -126,7 +125,8 @@ void playHangman(int sockfd) {
 
                 memset(buffer, 0, BUFFER_SIZE);
                 read(sockfd, buffer, wordlen);
-                printf("> > >");
+
+                printf(">>>");
                 for (int i = 0; i < wordlen; i++) {
                     if (i != wordlen - 1){
                         printf("%c ", buffer[i]);
@@ -135,11 +135,12 @@ void playHangman(int sockfd) {
                     }   
                 }
 
-                printf("> > >Incorrect Guesses: ");
+                printf(">>>Incorrect Guesses: ");
 
                 if (guesslen > 0) {
                     memset(buffer, 0, BUFFER_SIZE);
                     read(sockfd, buffer, guesslen);
+
                     for (int i = 0; i < guesslen; i++) {
                        if (i != guesslen - 1){
                             printf("%c ", buffer[i]);
@@ -148,7 +149,7 @@ void playHangman(int sockfd) {
                         }   
                     }
                 }
-                printf("\n");
+                printf("\n\n");
             } else {
                 int msglen = buffer[0];
                 memset(buffer, 0, BUFFER_SIZE);
@@ -160,6 +161,8 @@ void playHangman(int sockfd) {
         }
     }
 }
+
+
 
 int main(int argc, char *argv[]) {
     // ./hangman_client [IP] [port number... use 8080] 
@@ -179,4 +182,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-

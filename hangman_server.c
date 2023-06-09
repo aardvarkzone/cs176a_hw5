@@ -1,3 +1,15 @@
+/*
+skeleton code for TCP connection sourced from:
+https://stackoverflow.com/questions/11405819/does-struct-hostent-have-a-field-h-addr
+https://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/client.c
+
+srand logic sourced from: 
+https://www.tutorialspoint.com/c_standard_library/c_function_srand.htm
+
+some file reading logic sourced from: 
+https://stackoverflow.com/questions/27856886/read-text-file-and-store-in-array-in-c-programming
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,7 +29,6 @@
 
 // Client struct for storing data about a client
 typedef struct {
-    int sockfd;
     int remaining_guesses;
     char guessed_letters[MAX_GUESS_LENGTH + 1];
     char incorrect_letters[MAX_GUESS_LENGTH + 1];
@@ -26,7 +37,7 @@ typedef struct {
 // Error handling function
 void error(char *msg) {
     perror(msg);
-    exit(EXIT_FAILURE);
+    exit(0);
 }
 
 // Function to read words from a file
@@ -100,7 +111,7 @@ int main(int argc, char *argv[]) {
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_port = htons(8081);
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
         error("ERROR failed to set socket options");
@@ -169,7 +180,6 @@ int main(int argc, char *argv[]) {
                         memset(cli_words[i], '_', sizeof(cli_words[i]));
                         cli_words[i][wordlen] = '\0';
                         totalClients++;
-                        clients[i].sockfd = newsockfd;
                         write(newsockfd, &(int){0}, 1);
                         
                         int word_length = strlen(words[wordno]);
@@ -188,7 +198,7 @@ int main(int argc, char *argv[]) {
 
         // Handle client messages
         for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (newsockfds[i] > 0 && FD_ISSET(newsockfds[i], &fds)) {
+            if (newsockfds[i] > 0) { // && FD_ISSET(newsockfds[i], &fds)
                 int n = recv(newsockfds[i], buffer, 1, 0);
                 if (n < 0) {
                     error("ERROR receiving");
@@ -200,6 +210,14 @@ int main(int argc, char *argv[]) {
                     totalClients--;
                 }
                 else {
+                    // Check for termination message
+                    if (strcmp(buffer, "Client terminated") == 0) {
+                        printf("Client %d terminated connection.\n", i+1);
+                        close(newsockfds[i]);
+                        newsockfds[i] = 0;
+                        totalClients--;
+                        continue;
+                    }
                     // Handle client guess
                     int msglen = buffer[0];
                     if (msglen == 0) {
@@ -211,34 +229,27 @@ int main(int argc, char *argv[]) {
                         error("ERROR receiving");
                     }
 
-                    // Check for termination message
-                    if (strcmp(buffer, "Client terminated") == 0) {
-                        printf("Client %d terminated connection.\n", i+1);
-                        close(newsockfds[i]);
-                        newsockfds[i] = 0;
-                        totalClients--;
-                        break;
-                    }
+                    
 
                     // Update the game status
                     hangmanUpdate(buffer[0], cli_words[i], words[cli_wordnos[i]], &clients[i]);
 
                     // Game end condition: correct guess!
                     if (strcmp(cli_words[i], words[cli_wordnos[i]]) == 0) {
-                        write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
-                        write(newsockfds[i], ">>>The word was ", 13);
+                        write(newsockfds[i], &(int){43 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], ">>>The word was ", 16);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\n>>>You Win!\n>>>Game Over!", 21);
+                        write(newsockfds[i], "\n>>>You Win!\n>>>Game Over!", 27);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
                     }
                     // Game end condition: no more guesses!
                     else if (clients[i].remaining_guesses == 0) {
-                        write(newsockfds[i], &(int){34 + strlen(words[cli_wordnos[i]])}, 1);
-                        write(newsockfds[i], ">>>The word was ", 13);
+                        write(newsockfds[i], &(int){44 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], ">>>The word was ", 16);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\n>>>You Lose!\n>>>Game Over!", 21);
+                        write(newsockfds[i], "\n>>>You Lose!\n>>>Game Over!", 28);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;

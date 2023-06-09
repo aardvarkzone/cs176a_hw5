@@ -149,7 +149,7 @@ void playHangman(int sockfd) {
                         }   
                     }
                 }
-                printf("\n\n");
+                printf("\n");
             } else {
                 int msglen = buffer[0];
                 memset(buffer, 0, BUFFER_SIZE);

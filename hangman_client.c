@@ -79,6 +79,7 @@ void playHangman(int sockfd) {
         printf("Letter to guess: ");
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
             if (feof(stdin)) {
+                printf("\n");
                 // Send termination message to server (this depends on your protocol)
                 char term_msg[] = "Client terminated";
                 write(sockfd, term_msg, sizeof(term_msg));

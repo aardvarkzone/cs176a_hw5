@@ -181,6 +181,11 @@ int main(int argc, char *argv[]) {
                         cli_words[i][wordlen] = '\0';
                         totalClients++;
                         write(newsockfd, &(int){0}, 1);
+                        
+                        int word_length = strlen(words[wordno]);
+                        write(newsockfd, &word_length, sizeof(int));
+                        write(newsockfd, words[wordno], word_length);
+
                         break;
                     }
                 }

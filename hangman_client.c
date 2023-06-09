@@ -55,7 +55,12 @@ int connectToServer(const char *hostname, int port) {
 // Function to play hangman game 
 void playHangman(int sockfd) {
     char buffer[BUFFER_SIZE];
+   
+
     char letter;
+
+
+    
 
     read(sockfd, buffer, 1);
     if (buffer[0] > 0) {
@@ -73,7 +78,30 @@ void playHangman(int sockfd) {
         return;
     }
 
+
+
     send(sockfd, &(int){0}, 1, 0);
+
+    int word_length;
+
+    // Receive the word length from the server
+    read(sockfd, &word_length, sizeof(int));
+
+    // Receive the word from the server
+    read(sockfd, buffer, word_length);
+    buffer[word_length] = '\0';
+    
+    // Clear the buffer
+    memset(buffer, 0, BUFFER_SIZE);
+    
+    for (int i = 0; i < word_length; i++) {
+        if (i != (word_length - 1)) {
+            printf("_ ");
+        } else {
+            printf("_\n");
+        }
+    }
+    printf("Incorrect Guesses: \n\n");
 
     for (;;) {
         printf("Letter to guess: ");

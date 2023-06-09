@@ -52,6 +52,7 @@ int connectToServer(const char *hostname, int port) {
     return sockfd;
 }
 
+// Function to play hangman game 
 void playHangman(int sockfd) {
     char buffer[BUFFER_SIZE];
     char letter;
@@ -71,31 +72,14 @@ void playHangman(int sockfd) {
         close(sockfd);
         return;
     }
-    printf("\n");
 
     send(sockfd, &(int){0}, 1, 0);
 
-    read(sockfd, buffer, 1);
-    if (buffer[0] > 0) {
-        int wordlen = buffer[0];
-        memset(buffer, 0, BUFFER_SIZE);
-        read(sockfd, buffer, wordlen);
-
-        // Print the number of characters in the word
-        for (int i = 0; i < wordlen; i++) {
-            printf("_ ");
-        }
-        printf("\n");
-        printf("Incorrect Guesses: \n\n");
-    }
-
     for (;;) {
         printf("Letter to guess: ");
-        fflush(stdout);
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
             if (feof(stdin)) {
-                printf("\nEOF detected. Terminating...\n");
-
+                printf("\n");
                 // Send termination message to server (this depends on your protocol)
                 char term_msg[] = "Client terminated";
                 write(sockfd, term_msg, sizeof(term_msg));
@@ -125,22 +109,13 @@ void playHangman(int sockfd) {
 
                 memset(buffer, 0, BUFFER_SIZE);
                 read(sockfd, buffer, wordlen);
-
-                // Print correct word with spaces in between characters
-                for (int i = 0; i < wordlen; i++) {
-                    printf("%c ", buffer[i]);
-                }
-                printf("\n");
+                printf("%s\n", buffer);
                 printf("Incorrect Guesses: ");
 
                 if (guesslen > 0) {
                     memset(buffer, 0, BUFFER_SIZE);
                     read(sockfd, buffer, guesslen);
-
-                    // Print incorrect guesses with spaces in between
-                    for (int i = 0; i < guesslen; i++) {
-                        printf("%c ", buffer[i]);
-                    }
+                    printf("%s", buffer);
                 }
                 printf("\n\n");
             } else {
@@ -154,10 +129,6 @@ void playHangman(int sockfd) {
         }
     }
 }
-
-
-
-
 
 int main(int argc, char *argv[]) {
     // ./hangman_client [IP] [port number... use 8080] 
@@ -177,3 +148,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+

@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_port = htons(8081);
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
         error("ERROR failed to set socket options");
@@ -205,6 +205,14 @@ int main(int argc, char *argv[]) {
                     totalClients--;
                 }
                 else {
+                    // Check for termination message
+                    if (strcmp(buffer, "Client terminated") == 0) {
+                        printf("\nClient %d terminated.\n", i+1);
+                        close(newsockfds[i]);
+                        newsockfds[i] = 0;
+                        totalClients--;
+                        continue;
+                    }
                     // Handle client guess
                     int msglen = buffer[0];
                     if (msglen == 0) {

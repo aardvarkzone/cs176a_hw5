@@ -77,7 +77,17 @@ void playHangman(int sockfd) {
 
     for (;;) {
         printf("Letter to guess: ");
-        fgets(buffer, BUFFER_SIZE, stdin);
+        if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
+            if (feof(stdin)) {
+                // Send termination message to server (this depends on your protocol)
+                char term_msg[] = "Client terminated";
+                write(sockfd, term_msg, sizeof(term_msg));
+
+                close(sockfd);
+                exit(EXIT_SUCCESS);
+            }
+        }
+
         buffer[strcspn(buffer, "\n")] = '\0';
 
         letter = buffer[0];

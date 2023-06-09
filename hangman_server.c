@@ -1,4 +1,3 @@
-
 /*
 skeleton code for TCP connection sourced from:
 https://stackoverflow.com/questions/11405819/does-struct-hostent-have-a-field-h-addr
@@ -92,7 +91,6 @@ int main(int argc, char *argv[]) {
     // Initialize game data and server settings
     char words[15][MAX_WORD_LENGTH + 1];
     int wordCount = fileExtract("hangman_words.txt", words);
-
 
     int sockfd = 0;
     int newsockfd = 0;
@@ -234,7 +232,7 @@ int main(int argc, char *argv[]) {
                         write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
                         write(newsockfds[i], "The word was ", 13);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\nYou win!\nGame Over!", 20);
+                        write(newsockfds[i], "\nYou win!\nGame Over!", 21);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;

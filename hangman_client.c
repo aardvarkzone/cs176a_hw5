@@ -109,6 +109,11 @@ void playHangman(int sockfd) {
 
                 memset(buffer, 0, BUFFER_SIZE);
                 read(sockfd, buffer, wordlen);
+
+                // for (int i = 0; i < wordlen; i++) {
+                //     printf("%c ", buffer[i]);
+                // }
+
                 printf("%s\n", buffer);
                 printf("Incorrect Guesses: ");
 
@@ -116,8 +121,11 @@ void playHangman(int sockfd) {
                     memset(buffer, 0, BUFFER_SIZE);
                     read(sockfd, buffer, guesslen);
                     printf("%s", buffer);
+                    // for (int i = 0; i < guesslen; i++) {
+                    //     printf("%c ", buffer[i]);
+                    // }
                 }
-                printf("\n\n");
+                printf("\n");
             } else {
                 int msglen = buffer[0];
                 memset(buffer, 0, BUFFER_SIZE);

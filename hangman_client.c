@@ -110,11 +110,16 @@ void playHangman(int sockfd) {
                 memset(buffer, 0, BUFFER_SIZE);
                 read(sockfd, buffer, wordlen);
 
-                // for (int i = 0; i < wordlen; i++) {
-                //     printf("%c ", buffer[i]);
-                // }
+                for (int i = 0; i < wordlen; i++) {
+                    if (i != wordlen - 1){
+                        printf("%c ", buffer[i]);
+                    } else {
+                        printf("%c", buffer[i]);
+                    }   
+                }
+                
 
-                printf("%s\n", buffer);
+                //printf("%s\n", buffer);
                 printf("Incorrect Guesses: ");
 
                 if (guesslen > 0) {

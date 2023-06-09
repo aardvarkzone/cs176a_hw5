@@ -246,31 +246,7 @@ int main(int argc, char *argv[]) {
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
-                    }
-                    // Game continues: send updated word and guesses
-                    // else {
-                    //     write(newsockfds[i], &(int){0}, 1);
-                    //     int cli_word_len = strlen(cli_words[i]);
-                    //     int cli_guesses_len = strlen(clients[i].guessed_letters);
-
-
-                    //     int k = 0;
-                    //     char cli_word_spaces[2 * strlen(cli_words[i])];  
-                    //     for (int j = 0; cli_words[i][j] != '\0'; j++) {
-                    //         cli_word_spaces[k++] = cli_words[i][j];
-                    //         cli_word_spaces[k++] = ' ';
-                    //     }
-                    //     cli_word_spaces[k-1] = '\0';
-                    //     int cli_word_spaces_len = strlen(cli_word_spaces);
-
-
-                    //     //write(newsockfds[i], &cli_word_len, 1);
-                    //     write(newsockfds[i], &cli_word_spaces_len, 1);
-                    //     write(newsockfds[i], &cli_guesses_len, 1);
-                    //     //write(newsockfds[i], cli_words[i], cli_word_len);
-                    //     write(newsockfds[i], cli_word_spaces, cli_word_spaces_len);
-                    //     write(newsockfds[i], clients[i].guessed_letters, cli_guesses_len);
-                    // }             
+                    }         
                     else {
                         write(newsockfds[i], &(int){0}, 1);
                         int cli_word_len = strlen(cli_words[i]);

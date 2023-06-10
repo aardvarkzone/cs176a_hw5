@@ -236,20 +236,20 @@ int main(int argc, char *argv[]) {
 
                     //Game end condition: correct guess!
                     if (strcmp(cli_words[i], words[cli_wordnos[i]]) == 0) {
-                        write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
-                        write(newsockfds[i], "The word was ", 13);
+                        write(newsockfds[i], &(int){42 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], ">>>The word was ", 16);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\nYou win!\nGame over!", 21);
+                        write(newsockfds[i], "\n>>>You Win!\n>>>Game Over!", 26);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
                     }
                     // Game end condition: no more guesses!
                     else if (clients[i].remaining_guesses == 0) {
-                        write(newsockfds[i], &(int){34 + strlen(words[cli_wordnos[i]])}, 1);
-                        write(newsockfds[i], "The word was ", 13);
+                        write(newsockfds[i], &(int){43 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], ">>>The word was ", 16);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\nYou lose!\nGame over!", 21);
+                        write(newsockfds[i], "\n>>>You Lose!\n>>>Game Over!", 27);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;

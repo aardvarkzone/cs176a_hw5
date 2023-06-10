@@ -109,7 +109,7 @@ void playHangman(int sockfd) {
 
         letter = buffer[0];
         if (strlen(buffer) != 1 || !isalpha(letter)) {
-            printf("Error! Please guess one letter.\n");
+            printf(">>>Error! Please guess one letter.\n");
         } else {
             buffer[0] = 1;
             buffer[1] = tolower(letter);

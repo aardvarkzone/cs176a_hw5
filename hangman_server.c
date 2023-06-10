@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
 
         // Handle client messages
         for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (newsockfds[i] > 0) { // && FD_ISSET(newsockfds[i], &fds)
+            if (FD_ISSET(newsockfds[i], &fds)) { // && FD_ISSET(newsockfds[i], &fds)
                 int n = recv(newsockfds[i], buffer, 1, 0);
                 if (n < 0) {
                     error("ERROR receiving");

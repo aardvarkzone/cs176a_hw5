@@ -14,7 +14,7 @@ https://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/client.c
 #include <netdb.h>
 
 #define h_addr h_addr_list[0] /* for backward compatibility */
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 256
 
 void error(const char *msg) {
     perror(msg);
@@ -57,16 +57,25 @@ void playHangman(int sockfd) {
     char buffer[BUFFER_SIZE];
     char letter;
 
+    // clear buffer
+    memset(buffer, 0, sizeof(buffer));
     read(sockfd, buffer, 1);
+
     if (buffer[0] > 0) {
-        read(sockfd, buffer, buffer[0]);
-        buffer[strlen(buffer)] = '\0';
+        int bytesRead = 0;
+        while (1) {
+            read(sockfd, buffer + bytesRead, 1);
+            if (buffer[bytesRead] == '\0') {
+                break;
+            }
+            bytesRead++;
+        }
         printf("%s", buffer);
         return;
     }
-
     printf(">>>Ready to start game? (y/n): ");
     fflush(stdout);
+    memset(buffer, 0, sizeof(buffer));
     fgets(buffer, BUFFER_SIZE, stdin);
     if (buffer[0] != 'y') {
         close(sockfd);
@@ -93,6 +102,8 @@ void playHangman(int sockfd) {
 
     for (;;) {
         printf(">>>Letter to guess: ");
+        memset(buffer, 0, sizeof(buffer));
+
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
             if (feof(stdin)) {
                 printf("\n");

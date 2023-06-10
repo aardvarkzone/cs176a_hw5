@@ -181,10 +181,6 @@ int main(int argc, char *argv[]) {
                         cli_words[i][wordlen] = '\0';
                         totalClients++;
                         write(newsockfd, &(int){0}, 1);
-                        
-                        // int word_length = strlen(words[wordno]);
-                        // write(newsockfd, &word_length, sizeof(int));
-
                         break;
                     }
                 }
@@ -198,13 +194,12 @@ int main(int argc, char *argv[]) {
 
         // Handle client messages
         for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (FD_ISSET(newsockfds[i], &fds)) { // && FD_ISSET(newsockfds[i], &fds)
+            if (FD_ISSET(newsockfds[i], &fds)) {
                 int n = recv(newsockfds[i], buffer, 1, 0);
                 if (n < 0) {
                     error("ERROR receiving");
                 }
                 if (n == 0) {  // Client disconnected
-                    printf("Client %d disconnected.\n", i+1);
                     close(newsockfds[i]);
                     newsockfds[i] = 0;
                     totalClients--;
@@ -212,7 +207,7 @@ int main(int argc, char *argv[]) {
                 else {
                     // Check for termination message
                     if (strcmp(buffer, "Client terminated") == 0) {
-                        printf("Client %d terminated.\n", i+1);
+                        printf("\nClient %d terminated.\n", i+1);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
@@ -229,31 +224,30 @@ int main(int argc, char *argv[]) {
                         error("ERROR receiving");
                     }
 
-                    
-
                     // Update the game status
                     hangmanUpdate(buffer[0], cli_words[i], words[cli_wordnos[i]], &clients[i]);
 
                     // Game end condition: correct guess!
                     if (strcmp(cli_words[i], words[cli_wordnos[i]]) == 0) {
-                        write(newsockfds[i], &(int){43 + strlen(words[cli_wordnos[i]])}, 1);
-                        write(newsockfds[i], ">>>The word was ", 16);
+                        write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], "The word was ", 13);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\n>>>You Win!\n>>>Game Over!", 27);
+                        write(newsockfds[i], "\nYou win!\nGame over!", 21);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
                     }
                     // Game end condition: no more guesses!
                     else if (clients[i].remaining_guesses == 0) {
-                        write(newsockfds[i], &(int){44 + strlen(words[cli_wordnos[i]])}, 1);
-                        write(newsockfds[i], ">>>The word was ", 16);
+                        write(newsockfds[i], &(int){34 + strlen(words[cli_wordnos[i]])}, 1);
+                        write(newsockfds[i], "The word was ", 13);
                         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                        write(newsockfds[i], "\n>>>You Lose!\n>>>Game Over!", 28);
+                        write(newsockfds[i], "\nYou lose!\nGame over!", 21);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
-                    }         
+                    }
+                    // Game continues: send updated word and guesses
                     else {
                         write(newsockfds[i], &(int){0}, 1);
                         int cli_word_len = strlen(cli_words[i]);
@@ -263,37 +257,7 @@ int main(int argc, char *argv[]) {
                         write(newsockfds[i], cli_words[i], cli_word_len);
                         write(newsockfds[i], clients[i].guessed_letters, cli_guesses_len);
                     }
-                    //Game end condition: correct guess!
-                //     if (strcmp(cli_words[i], words[cli_wordnos[i]]) == 0) {
-                //         write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
-                //         write(newsockfds[i], "The word was ", 13);
-                //         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                //         write(newsockfds[i], "\nYou win!\nGame over!", 21);
-                //         close(newsockfds[i]);
-                //         newsockfds[i] = 0;
-                //         totalClients--;
-                //     }
-                //     // Game end condition: no more guesses!
-                //     else if (clients[i].remaining_guesses == 0) {
-                //         write(newsockfds[i], &(int){34 + strlen(words[cli_wordnos[i]])}, 1);
-                //         write(newsockfds[i], "The word was ", 13);
-                //         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
-                //         write(newsockfds[i], "\nYou lose!\nGame over!", 21);
-                //         close(newsockfds[i]);
-                //         newsockfds[i] = 0;
-                //         totalClients--;
-                //     }
-                //     // Game continues: send updated word and guesses
-                //     else {
-                //         write(newsockfds[i], &(int){0}, 1);
-                //         int cli_word_len = strlen(cli_words[i]);
-                //         int cli_guesses_len = strlen(clients[i].guessed_letters);
-                //         write(newsockfds[i], &cli_word_len, 1);
-                //         write(newsockfds[i], &cli_guesses_len, 1);
-                //         write(newsockfds[i], cli_words[i], cli_word_len);
-                //         write(newsockfds[i], clients[i].guessed_letters, cli_guesses_len);
-                //     }
-                // }
+                }
             }
         }
     }

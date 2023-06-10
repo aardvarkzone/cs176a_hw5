@@ -75,20 +75,20 @@ void playHangman(int sockfd) {
 
     send(sockfd, &(int){0}, 1, 0);
 
-    int word_length;
+    // int word_length;
 
-    // Receive the word length from the server
-    read(sockfd, &word_length, sizeof(int));
+    // // Receive the word length from the server
+    // read(sockfd, &word_length, sizeof(int));
 
-    printf(">>>");
-    for (int i = 0; i < word_length; i++) {
-        if (i != (word_length - 1)) {
-            printf("_ ");
-        } else {
-            printf("_\n");
-        }
-    }
-    printf(">>>Incorrect Guesses: \n>>>\n");
+    // printf(">>>");
+    // for (int i = 0; i < word_length; i++) {
+    //     if (i != (word_length - 1)) {
+    //         printf("_ ");
+    //     } else {
+    //         printf("_\n");
+    //     }
+    // }
+    // printf(">>>Incorrect Guesses: \n>>>\n");
 
 
     for (;;) {
@@ -149,7 +149,7 @@ void playHangman(int sockfd) {
                         }   
                     }
                 }
-                printf("\n");
+                printf(">>>\n");
             } else {
                 int msglen = buffer[0];
                 memset(buffer, 0, BUFFER_SIZE);

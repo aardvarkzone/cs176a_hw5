@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_port = htons(8083);
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
         error("ERROR failed to set socket options");
@@ -182,8 +182,8 @@ int main(int argc, char *argv[]) {
                         totalClients++;
                         write(newsockfd, &(int){0}, 1);
                         
-                        int word_length = strlen(words[wordno]);
-                        write(newsockfd, &word_length, sizeof(int));
+                        // int word_length = strlen(words[wordno]);
+                        // write(newsockfd, &word_length, sizeof(int));
 
                         break;
                     }
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
                 else {
                     // Check for termination message
                     if (strcmp(buffer, "Client terminated") == 0) {
-                        printf("Client %d terminated connection.\n", i+1);
+                        printf("Client %d terminated.\n", i+1);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;

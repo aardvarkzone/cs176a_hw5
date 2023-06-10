@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(8083);
+    serv_addr.sin_port = htons(8080);
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
         error("ERROR failed to set socket options");
@@ -263,7 +263,37 @@ int main(int argc, char *argv[]) {
                         write(newsockfds[i], cli_words[i], cli_word_len);
                         write(newsockfds[i], clients[i].guessed_letters, cli_guesses_len);
                     }
-                }
+                    //Game end condition: correct guess!
+                //     if (strcmp(cli_words[i], words[cli_wordnos[i]]) == 0) {
+                //         write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
+                //         write(newsockfds[i], "The word was ", 13);
+                //         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
+                //         write(newsockfds[i], "\nYou win!\nGame over!", 21);
+                //         close(newsockfds[i]);
+                //         newsockfds[i] = 0;
+                //         totalClients--;
+                //     }
+                //     // Game end condition: no more guesses!
+                //     else if (clients[i].remaining_guesses == 0) {
+                //         write(newsockfds[i], &(int){34 + strlen(words[cli_wordnos[i]])}, 1);
+                //         write(newsockfds[i], "The word was ", 13);
+                //         write(newsockfds[i], words[cli_wordnos[i]], strlen(words[cli_wordnos[i]]));
+                //         write(newsockfds[i], "\nYou lose!\nGame over!", 21);
+                //         close(newsockfds[i]);
+                //         newsockfds[i] = 0;
+                //         totalClients--;
+                //     }
+                //     // Game continues: send updated word and guesses
+                //     else {
+                //         write(newsockfds[i], &(int){0}, 1);
+                //         int cli_word_len = strlen(cli_words[i]);
+                //         int cli_guesses_len = strlen(clients[i].guessed_letters);
+                //         write(newsockfds[i], &cli_word_len, 1);
+                //         write(newsockfds[i], &cli_guesses_len, 1);
+                //         write(newsockfds[i], cli_words[i], cli_word_len);
+                //         write(newsockfds[i], clients[i].guessed_letters, cli_guesses_len);
+                //     }
+                // }
             }
         }
     }

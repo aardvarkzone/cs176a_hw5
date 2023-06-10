@@ -148,6 +148,8 @@ void playHangman(int sockfd) {
                             printf("%c\n", buffer[i]);
                         }   
                     }
+                } else {
+                    printf("\n");
                 }
                 printf(">>>\n");
             } else {

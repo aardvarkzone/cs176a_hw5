@@ -181,6 +181,10 @@ int main(int argc, char *argv[]) {
                         cli_words[i][wordlen] = '\0';
                         totalClients++;
                         write(newsockfd, &(int){0}, 1);
+                        
+                        int word_length = strlen(words[wordno]);
+                        write(newsockfd, &word_length, sizeof(int));
+
                         break;
                     }
                 }
@@ -194,12 +198,13 @@ int main(int argc, char *argv[]) {
 
         // Handle client messages
         for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (FD_ISSET(newsockfds[i], &fds)) {
+            if (FD_ISSET(newsockfds[i], &fds)) { // && FD_ISSET(newsockfds[i], &fds)
                 int n = recv(newsockfds[i], buffer, 1, 0);
-                if (n < 0) {
-                    error("ERROR receiving");
-                }
-                if (n == 0) {  // Client disconnected
+                // if (n < 0) {
+                //     error("ERROR receiving");
+                // }
+                if (n == -1) {  // Client disconnected
+                    printf("Client %d disconnected.\n", i+1);
                     close(newsockfds[i]);
                     newsockfds[i] = 0;
                     totalClients--;
@@ -207,7 +212,7 @@ int main(int argc, char *argv[]) {
                 else {
                     // Check for termination message
                     if (strcmp(buffer, "Client terminated") == 0) {
-                        printf("\nClient %d terminated.\n", i+1);
+                        printf("Client %d terminated.\n", i+1);
                         close(newsockfds[i]);
                         newsockfds[i] = 0;
                         totalClients--;
@@ -224,10 +229,12 @@ int main(int argc, char *argv[]) {
                         error("ERROR receiving");
                     }
 
+                    
+
                     // Update the game status
                     hangmanUpdate(buffer[0], cli_words[i], words[cli_wordnos[i]], &clients[i]);
 
-                    // Game end condition: correct guess!
+                    //Game end condition: correct guess!
                     if (strcmp(cli_words[i], words[cli_wordnos[i]]) == 0) {
                         write(newsockfds[i], &(int){33 + strlen(words[cli_wordnos[i]])}, 1);
                         write(newsockfds[i], "The word was ", 13);

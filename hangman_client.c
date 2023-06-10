@@ -65,7 +65,7 @@ void playHangman(int sockfd) {
         return;
     }
 
-    printf("Ready to start game? (y/n): ");
+    printf(">>>Ready to start game? (y/n): ");
     fflush(stdout);
     fgets(buffer, BUFFER_SIZE, stdin);
     if (buffer[0] != 'y') {
@@ -75,13 +75,28 @@ void playHangman(int sockfd) {
 
     send(sockfd, &(int){0}, 1, 0);
 
+    int word_length;
+
+    // Receive the word length from the server
+    read(sockfd, &word_length, sizeof(int));
+
+    printf(">>>");
+    for (int i = 0; i < word_length; i++) {
+        if (i != (word_length - 1)) {
+            printf("_ ");
+        } else {
+            printf("_\n");
+        }
+    }
+    printf(">>>Incorrect Guesses: \n>>>\n");
+
+
     for (;;) {
-        printf("Letter to guess: ");
+        printf(">>>Letter to guess: ");
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {  // Check for EOF
             if (feof(stdin)) {
-                printf("\nEOF detected. Terminating...\n");
-
-                // Send termination message to server (this depends on your protocol)
+                printf("\n");
+                // Send termination message to server 
                 char term_msg[] = "Client terminated";
                 write(sockfd, term_msg, sizeof(term_msg));
 
@@ -111,23 +126,32 @@ void playHangman(int sockfd) {
                 memset(buffer, 0, BUFFER_SIZE);
                 read(sockfd, buffer, wordlen);
 
-                // Print correct word with spaces in between characters
+                printf(">>>");
                 for (int i = 0; i < wordlen; i++) {
-                    printf("%c ", buffer[i]);
+                    if (i != wordlen - 1){
+                        printf("%c ", buffer[i]);
+                    } else {
+                        printf("%c\n", buffer[i]);
+                    }   
                 }
-                printf("\n");
-                printf("Incorrect Guesses: ");
+
+                printf(">>>Incorrect Guesses: ");
 
                 if (guesslen > 0) {
                     memset(buffer, 0, BUFFER_SIZE);
                     read(sockfd, buffer, guesslen);
 
-                    // Print incorrect guesses with spaces in between
                     for (int i = 0; i < guesslen; i++) {
-                        printf("%c ", buffer[i]);
+                       if (i != guesslen - 1){
+                            printf("%c ", buffer[i]);
+                        } else {
+                            printf("%c\n", buffer[i]);
+                        }   
                     }
+                } else {
+                    printf("\n");
                 }
-                printf("\n\n");
+                printf(">>>\n");
             } else {
                 int msglen = buffer[0];
                 memset(buffer, 0, BUFFER_SIZE);

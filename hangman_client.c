@@ -116,7 +116,7 @@ void playHangman(int sockfd) {
                     printf("%c ", buffer[i]);
                 }
                 printf("\n");
-                printf("Incorrect guesses: ");
+                printf("Incorrect Guesses: ");
 
                 if (guesslen > 0) {
                     memset(buffer, 0, BUFFER_SIZE);
@@ -127,7 +127,7 @@ void playHangman(int sockfd) {
                         printf("%c ", buffer[i]);
                     }
                 }
-                printf("\n");
+                printf("\n\n");
             } else {
                 int msglen = buffer[0];
                 memset(buffer, 0, BUFFER_SIZE);
